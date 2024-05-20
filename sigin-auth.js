@@ -1,7 +1,12 @@
+function login() {
+    chrome.runtime.sendMessage({ type: 'login' });
+  }
+
 document.getElementById('loginForm').addEventListener('submit', function(event) {
     event.preventDefault();
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
+
   
     // Replace this with your actual login API call
     fetch('http://localhost:3000/login', {
@@ -13,6 +18,7 @@ document.getElementById('loginForm').addEventListener('submit', function(event) 
     .then(data => {
       if (data.success) {
         // Save login status
+        login();
         chrome.storage.sync.set({ loggedIn: true }, function() {
           // Redirect to popup.html
           window.location.href = 'popup.html';

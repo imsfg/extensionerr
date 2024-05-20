@@ -220,6 +220,11 @@ app.get('/check-login', (req, res) => {
 });
 
 
+app.post('/sign-out', (req, res) => {
+  loggedIn = false;
+  res.json({ success: true, message: 'User signed out successfully' });
+});
+
   // app.get('/blocked-websites', (req, res) => {
   //   let sql = 'SELECT domain FROM db WHERE status = "Block"';
     
@@ -234,34 +239,7 @@ app.get('/check-login', (req, res) => {
   //   });
   // });
 
-  app.post('/signup', (req, res) => {
-    const { username, password } = req.body;
-    connection.query('SELECT * FROM users WHERE username = ?', [username], (err, results) => {
-      if (err) {
-        console.error('Error querying MySQL database:', err);
-        return res.status(500).json({ success: false, message: 'Internal Server Error' });
-      }
   
-      if (results.length > 0) {
-        return res.status(400).json({ success: false, message: 'Username already exists' });
-      }
-  
-      // Insert new user into the database
-  
-      connection.query('INSERT INTO users (username, password) VALUES (?, ?)', [username, password], (err, result) => {
-        if (err) {
-          console.error('Error inserting user into MySQL database:', err);
-          return res.status(500).json({ success: false, message: 'Internal Server Error' });
-        }
-        console.log("ues")
-        return res.status(201).json({ success: true, message: 'User signed up successfully' });
-      });
-    });
-  });
-  
-
-
-
 
   
 app.listen(port, () => {

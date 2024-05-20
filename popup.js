@@ -469,12 +469,43 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 });
 
-function signOut() {
-  // Update the login status in Chrome storage
-  chrome.storage.sync.set({ loggedIn: false }, function() {
-    console.log('User signed out');
-    // Close the popup window
-    window.location.href = "login.html";
-  });
+// Send a message to the background script when logout is triggered
+function logout() {
+  chrome.runtime.sendMessage({ type: 'logout' });
 }
-document.getElementById('sign-out-btn').addEventListener('click', signOut);
+
+
+document.addEventListener("DOMContentLoaded", function () {
+  chrome.storage.sync.get("loggedIn", function (data) {
+    if (!data.loggedIn) {
+      window.location.href = "login.html";
+    } else {
+      // Existing functionality...
+
+      document.getElementById('sign-out-btn').addEventListener('click', function() {
+        fetch("http://localhost:3000/sign-out", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" }
+        })
+        .then(response => {
+          if (!response.ok) throw new Error("Failed to sign out");
+          return response.json();
+        })
+        .then(data => {
+          if (data.success) {
+            chrome.storage.sync.set({ loggedIn: false }, () => {
+              console.log('User signed out');
+              logout();
+              window.close();
+            });
+          }
+        })
+        .catch(error => {
+          console.error('Error signing out:', error);
+        });
+      });
+
+      // Existing functionality...
+    }
+  });
+});
